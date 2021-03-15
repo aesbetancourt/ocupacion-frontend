@@ -1,0 +1,10 @@
+{
+    apps : [
+      {
+        name      : "ocupacion-frontend",
+        script    : "npx",
+        interpreter: "none",
+        args: "npm start"
+      }
+    ]
+  }
