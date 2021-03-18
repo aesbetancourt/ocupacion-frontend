@@ -9,6 +9,8 @@ import Component1 from './Component1';
 import Component2 from './Component2';
 import Component3 from './Component3';
 
+import Occupation from './Occupation';
+
 const { Header, Content, Footer } = Layout;
 
 
@@ -25,6 +27,7 @@ class TopMenu extends React.Component {
                       <Menu.Item key="1" onClick={() => this.setState({selected: 1})}>nav 1</Menu.Item>
                       <Menu.Item key="2" onClick={() => this.setState({selected: 2})}>nav 2</Menu.Item>
                       <Menu.Item key="3" onClick={() => this.setState({selected: 3})}>nav 3</Menu.Item>
+                      <Menu.Item key="4" onClick={() => this.setState({selected: 4})}>Ocupación</Menu.Item>
                   </Menu>
               </Header>
               <Content className="site-layout"  style={{ padding: '0 50px', marginTop: 64 }}>
@@ -32,6 +35,7 @@ class TopMenu extends React.Component {
                       {this.state.selected === 1 ? <Component1/> : null}
                       {this.state.selected === 2 ? <Component2/> : null}
                       {this.state.selected === 3 ? <Component3/> : null}
+                      {this.state.selected === 4 ? <Occupation/> : null}
                   </div>
               </Content>
               <Footer style={{ textAlign: 'center' }}>Intelix Synergy ©2021 </Footer>
