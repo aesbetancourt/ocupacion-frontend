@@ -1,5 +1,5 @@
 {
-  "name": "notes-frontend",
+  "name": "ocupacion-frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -8,6 +8,7 @@
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.8.3",
     "antd": "^4.14.0",
+    "antd-editabletable": "^0.0.12",
     "axios": "^0.21.1",
     "moment": "^2.29.1",
     "react": "^17.0.1",
