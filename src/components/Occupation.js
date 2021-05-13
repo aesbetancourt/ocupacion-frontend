@@ -1,21 +1,48 @@
 // Importing needed components
-import React, {useState, useEffect} from 'react';
-import  { Input, Divider, Row, Col, Select, DatePicker, InputNumber, Button } from 'antd';
+import React, {useState, useRef, useEffect} from 'react';
+import {Input, Divider, Row, Col, Select, DatePicker, InputNumber, Button} from 'antd';
 import moment from 'moment'
-import EditableTable from 'antd-editabletable';
+import DynamicTable from './Occupation/DynamicTable'
+
 const { Option } = Select;
+
 
 // Constants
 // Axios Defaults
 const axiosInstance = require("../utils/request").default;
- let originData = []
+let activities = []
+let collabs = []
+
+axiosInstance.get('/no_portafolio/oactivities')
+.then(async function (response) {
+    for (let i = 0; i < response.data.length; i++) {
+        activities.push(<Option value={response.data[i].act_id}>{response.data[i].act_title}</Option>);
+    }
+})
+.catch(function (error) {
+})
+.then(function () {
+});
+
+
+axiosInstance.get('/no_portafolio/ocollabs')
+.then(async function (response) {
+    for (let i = 0; i < response.data.length; i++) {
+        collabs.push(
+            <Option value={response.data[i].col_id_file}>
+                {response.data[i].col_name + " " + response.data[i].col_last_name}
+            </Option>
+        );
+    }
+})
+.catch(function (error) {
+})
+.then(function () {
+});
 
 
 // Exported Component
 const Occupation = () =>{
-
-    // const [activities, setActivities] = useState([]);
-    // const [collaborators, setCollaborators] = useState([]);
 
 
     const [activityID, setActivityID] = useState("");
@@ -23,54 +50,23 @@ const Occupation = () =>{
     const [percentage, setPercentage] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
-    const [dataSource, setDataSource] = React.useState([]);
+    const childRef = useRef();
 
 
 
+    // function  getData(){
+   
 
 
-    function getData(){
-        axiosInstance.get('/no_portafolio/occupation')
-            .then(async function (response) {
-                // console.log(response.data[0].activities.act_title)
-                for (let i = 0; i < response.data.length ; i++) {
-                  originData.push({
-                        key: i,
-                        activity: response.data[i].activities.act_title ,
-                        name: response.data[i].collaborators.col_name + " " + response.data[i].collaborators.col_last_name,
-                        pert: response.data[i].occ_percentage,
-                        start: moment(response.data[i].occ_start_date),
-                        end: moment(response.data[i].occ_end_date),
-                    });
-                }
-                await setDataSource(originData)
-            })
-            .catch(function (error) {
-            })
-            .then(function () {
-                console.log("ok")
-            });
-    }
-
-    useEffect(  () => {
-        getData()
-
-    }, [])
-
-
-
-    // for (let i = 0; i < 100; i++) {
-    //     originData.push({
-    //         key: i.toString(),
-    //         name: `Edrward ${i}`,
-    //         // age: 32,
-    //         // address: `London Park no. ${i}`,
-    //     });
     // }
+    
 
+    // useEffect(  () => {
+    //     getData()
+    //     console.log(activities)
+    // }, [])
 
-
-
+    // Create Occupation
 
     function activityChange(e){
         // console.log(e)
@@ -112,9 +108,10 @@ const Occupation = () =>{
             "start": startDate,
             "end": endDate
         })
-            .then(res => {
+            .then(async res => {
                 // handle success
                 console.log(res.statusText)
+
             })
             .catch(err => {
                 // handle error
@@ -122,74 +119,14 @@ const Occupation = () =>{
             })
             .then(function () {
                 // always executed
+                childRef.current.addOccupation()
             });
     }
 
+
+
     //
 
-
-    const getConfig = (formItemType) => {
-        const map = {
-            SELECT: {
-                options: [
-                    { name: 'a', value: 'a' },
-                    { name: 'b', value: 'b' },
-                ],
-                validateRules: [{ required: true, message: '请选择' }],
-            },
-            INPUT_NUMBER:{
-                value: `${parseInt(Math.random() * 100, 10)}`,
-                validateRules: [{ required: true, message: '请输入' }],
-            },
-            DATE_PICKER: {
-                validateRules: [{ required: true, message: '请选择' }],
-            },
-
-        }
-        return {
-            formItemType,
-            ...map[formItemType],
-        }
-    }
-    // const getNewRecord = key => {
-    //     console.log(key)
-    //     return {
-    //         key,
-    //         SELECT: undefined,
-    //         INPUT_NUMBER: undefined,
-    //         DATE_PICKER: undefined,
-    //
-    //     };
-    // };
-    const getColumns = () => {
-        return [
-            {
-                title: 'Actividad',
-                dataIndex: 'activity',
-                ...getConfig("SELECT")
-            },
-            {
-                title: 'Colaborador',
-                dataIndex: 'name',
-                ...getConfig("SELECT")
-            },
-            {
-                title: '%',
-                dataIndex: 'pert',
-                ...getConfig("INPUT_NUMBER")
-            },
-            {
-                title: 'Inicio',
-                dataIndex: 'start',
-                ...getConfig("DATE_PICKER")
-            },
-            {
-                title: 'Fin',
-                dataIndex: 'end',
-                ...getConfig("DATE_PICKER")
-            }
-        ]
-    };
 
     return (
         <div>
@@ -197,6 +134,7 @@ const Occupation = () =>{
             <Row>
                 <Col span={6} order={4}>
                     <Button
+                        disabled={(activityID.length === 0 || collaboratorID.length === 0 || percentage.length === 0 || startDate.length === 0 || endDate.length === 0)}
                         type="primary"
                         onClick={createOcc}
                         style={{  marginTop: "19px", marginLeft: "80px", width: "200px" }}
@@ -223,29 +161,6 @@ const Occupation = () =>{
                     </Input.Group>
                 </Col>
                 <Col span={6} order={2}>
-                    <h6>Colaborador</h6>
-                    <Select
-                        onChange={collaboratorChange}
-                        showSearch
-                        style={{ width: 300 }}
-                        placeholder="Seleccionar Colaborador"
-                        optionFilterProp="children"
-                        filterOption={(input, option) =>
-                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        filterSort={(optionA, optionB) =>
-                            optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
-                        }
-                    >
-                        <Option value="1">Not Identified</Option>
-                        <Option value="2">Closed</Option>
-                        <Option value="3">Communicated</Option>
-                        <Option value="4">Identified</Option>
-                        <Option value="5">Resolved</Option>
-                        <Option value="6">Cancelled</Option>
-                    </Select>
-                </Col>
-                <Col span={6} order={1}>
                     <h6>Actividad</h6>
                     <Select
                         onChange={activityChange}
@@ -260,33 +175,30 @@ const Occupation = () =>{
                             optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
                         }
                     >
-                        <Option value="1">Not Identified</Option>
-                        <Option value="2">Closed</Option>
-                        <Option value="3">Communicated</Option>
-                        <Option value="4">Identified</Option>
-                        <Option value="5">Resolved</Option>
-                        <Option value="6">Cancelled</Option>
+                        {activities}
+                    </Select>
+                </Col>
+                <Col span={6} order={1}>
+                    <h6>Colaborador</h6>
+                    <Select
+                        onChange={collaboratorChange}
+                        showSearch
+                        style={{ width: 300 }}
+                        placeholder="Seleccionar Colaborador"
+                        optionFilterProp="children"
+                        filterOption={(input, option) =>
+                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        filterSort={(optionA, optionB) =>
+                            optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
+                        }
+                    >
+                    {collabs}
                     </Select>
                 </Col>
             </Row>
             <Divider orientation="Center">Tabla General</Divider>
-            <EditableTable
-                // pagination={false}
-                // size="middle"
-                // showAdd
-                rowKey={record => record.key}
-                // onAdd={() => {
-                //     setDataSource([...dataSource, getNewRecord(`${dataSource.length+1}`)]);
-                // }}
-                // addText="添加"
-                columns={getColumns()}
-                dataSource={dataSource}
-                // onChange={(key, value, record, newDataSource) => {
-                //     setDataSource(newDataSource);
-                // }}
-                onChange={(key, value, record, newDataSource) => {console.log(key, value, record, newDataSource)}}
-                // scroll={{y:window.innerHeight - 300}}
-            />
+            <DynamicTable ref={childRef} />
         </div>
     )
 }
