@@ -2,12 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 // import App from './App';
-import Navigation from './components/Navigation';
+import Index from './components/Index/Index';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
   // <React.StrictMode>
-    <Navigation />,
+    <Index />,
   // </React.StrictMode>,
   document.getElementById('root')
 );
