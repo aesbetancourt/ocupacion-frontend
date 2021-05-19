@@ -94,7 +94,7 @@ const TableActivities = ({portafolio, testing, fillData, onEdit}) =>{
     const onDelete = (act_id) => {
         axios.delete(`/activities`, { data: { act_id } })
         .then( data =>{
-            message.success(data.data);
+            message.success(data.data.message);
             setReload(reload+1)
         })
         .catch( err =>{
