@@ -29,7 +29,7 @@ const FormActivitie = ({ clients, onFinish }) =>{
                             placeholder="Cliente de la actividad..."
                             style={{ width: 300}}
                             showSearch
-                            onChange={(e)=>setData({...data, cli_id: e.target.value})}
+                            onChange={(e)=>setData({...data, cli_id: e})}
                             optionFilterProp="children"
                             filterOption={(input, option) =>
                                 option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
