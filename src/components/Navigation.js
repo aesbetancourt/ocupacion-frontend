@@ -14,6 +14,7 @@ import {
 import Component1 from './Component1';
 import Component2 from './Component2';
 import Activites from './activities/activites';
+import Reports from './reports/Reports';
 
 import Occupation from './Occupation';
 
@@ -37,7 +38,7 @@ const TopMenu = ({ role, name}) => {
                 <div className="logo" />
                 <Menu theme="dark" mode="horizontal" defaultSelectedKeys={[selected]}>
                     <Menu.Item key="1" onClick={() => setNavigation(1)}>nav 1</Menu.Item>
-                    <Menu.Item key="2" onClick={() => setNavigation(2)}>nav 2</Menu.Item>
+                    <Menu.Item key="2" onClick={() => setNavigation(2)}>Reportes</Menu.Item>
                     <Menu.Item key="3" onClick={() => setNavigation(3)}>Actividades</Menu.Item>
                     <Menu.Item key="4" onClick={() => setNavigation(4)}>Ocupación</Menu.Item>
                     <Menu.SubMenu 
@@ -54,7 +55,7 @@ const TopMenu = ({ role, name}) => {
             <Content className="site-layout"  style={{ padding: '0 50px', marginTop: 64 }}>
                 <div className="site-layout-background" style={{ padding: 24, minHeight: 380, marginTop: 40  }}>
                     {String(selected) === String(1) ? <Component1/> : null}
-                    {String(selected) === String(2) ? <Component2/> : null}
+                    {String(selected) === String(2) ? <Reports/> : null}
                     {String(selected) === String(3) ? <Activites/> : null}
                     {String(selected) === String(4) ? <Occupation/> : null}
                 </div>
