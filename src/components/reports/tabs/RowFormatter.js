@@ -95,7 +95,7 @@ const RenderClient = ({row}) => {
 }
 const RenderClient2= ({data, parent}) => {
     if(!parent){
-        return <b>-</b>
+        return <b>-----</b>
     }
     return (
         <img

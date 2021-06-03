@@ -44,6 +44,7 @@ const RenderStatus = ({data, updateActivitie}) => {
         key={data.act_id+"--"+data.act_status}
         data-testid={data.act_id+"--act_status"}
         defaultChecked={data.act_status === 1} 
+        disabled={data.act_status === -1}
         onChange={(status)=>{
             if(updateActivitie){
                 updateActivitie({ act_id: data.act_id, act_status: status ? 1 : 0 })

@@ -42,36 +42,40 @@ const TableReports = () =>{
         {
             columns: [
                 {
-                    title: "Sede", 
-                    width: {wch: 20}, 
+                    title: "Cliente", 
+                    width: {wch: 40}, 
                     style: styleTitle
                 },{
-                    title: "Cliente", 
-                    width: {wch: 20}, 
+                    title: "Sede", 
+                    width: {wch: 40}, 
                     style: styleTitle
                 },{
                     title: "Colaborador", 
-                    width: {wch: 80}, 
+                    width: {wch: 40}, 
                     style: styleTitle
                 },{
                     title: "Actividad", 
-                    width: {wch: 80}, 
+                    width: {wch: 40}, 
+                    style: styleTitle
+                },{
+                    title: "Periodo de desarrollo", 
+                    width: {wch: 40}, 
                     style: styleTitle
                 },{
                     title: "Sum(HH Clockify)", 
-                    width: {wch: 20}, 
+                    width: {wch: 40}, 
                     style: styleTitle
                 },{
                     title: "% Ocupación ", 
-                    width: {wch: 20}, 
+                    width: {wch: 40}, 
                     style: styleTitle
                 },{
                     title: "% Real", 
-                    width: {wch: 20}, 
+                    width: {wch: 40}, 
                     style: styleTitle
                 },{
                     title: "Grupo Solucionador", 
-                    width: {wch: 20}, 
+                    width: {wch: 40}, 
                     style: styleTitle
                 }
             ],
@@ -201,28 +205,65 @@ const TableReports = () =>{
                 data1 : data2
     }
     const mapObj = (row, parent) => {
-        return {
-            parent,
-            act_id: row.act_id,
-            Sede: !parent ? (row.collaborators? 
-                row.collaborators.col_campus
-                :
-                'No portafolio') : '-',
-            Cliente:  parent ?  row.activities.clients.cli_name : '-',
-            Colaborador:  !parent ?  row.collaborators.col_name + ' '+row.collaborators.col_last_name : '-',
-            Actividad:  parent ?  row.activities.act_title : '-',
-            sum_hh: row.summary_time_card.length > 0 ? 
-                row.summary_time_card.map(el => el.sum_hh).reduce((a, b) => a + b, 0)
-                :
-                0,
-            OcupacionPerc: !parent ? row.occ_percentage : '-',
-            OcupacionReal:  !parent ? row.occ_real : '-',
-            por_solver_group:  parent ?  (row.activities.portfolio_requests ? 
-                row.activities.portfolio_requests.por_solver_group
-                :
-                'No portafolio') : '-',
-            activities: row.activities
+        let date, month;
+        if(!parent){
+            let response = []
+            for (let index = 0; index < row.summary_time_card.length; index++) {
+                date = new Date(
+                    row.summary_time_card[index].sum_year, 
+                    row.summary_time_card[index].sum_month-1, 
+                    1);
+                month = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+                month = month.toUpperCase();
+                response.push(
+                    {
+                        parent,
+                        act_id: row.act_id,
+                        Sede: (row.collaborators? 
+                            row.collaborators.col_campus
+                            :
+                            'No portafolio'),
+                        Cliente: '-----',
+                        Colaborador: row.collaborators.col_name + ' '+row.collaborators.col_last_name,
+                        Actividad: '-----',
+                        sum_hh: row.summary_time_card[index] ? 
+                            row.summary_time_card[index].sum_hh 
+                            :
+                            0,
+                        sum_month: month,
+                        OcupacionPerc: row.occ_percentage  + '%',
+                        OcupacionReal: row.occ_real + '%',
+                        por_solver_group: '-----',
+                        activities: row.activities
+                    }
+                )
+            }
+            return response
+        }else{
+            month = '-----'
+            return {
+                parent,
+                act_id: row.act_id,
+                Sede: '-----',
+                Cliente: row.activities.clients.cli_name,
+                Colaborador: '-----',
+                Actividad: row.activities.act_title,
+                sum_hh: row.summary_time_card.length > 0 ? 
+                    row.summary_time_card.map(el => el.sum_hh).reduce((a, b) => a + b, 0)
+                    :
+                    0,
+                
+                sum_month: month,
+                OcupacionReal: '-----',
+                OcupacionPerc: '-----',
+                por_solver_group: (row.activities.portfolio_requests ? 
+                    row.activities.portfolio_requests.por_solver_group
+                    :
+                    'No portafolio'),
+                activities: row.activities
+            }
         }
+        
     }
     React.useEffect(  () => {
         const runSync = async (fetchData) => {
@@ -245,13 +286,13 @@ const TableReports = () =>{
                 if(index === 0){
                     copy.push({
                         ...mapObj(currDataSrc[index], true),
-                        children: [mapObj(currDataSrc[index], false)]
+                        children: mapObj(currDataSrc[index], false)
                     })
                 }else{
                     dup = false;
                     for (let index2 = 0; index2 < copy.length; index2++) {
                         if(currDataSrc[index].act_id === copy[index2].act_id){
-                            copy[index2].children.push(mapObj(currDataSrc[index], false)) 
+                            copy[index2].children = copy[index2].children.concat(mapObj(currDataSrc[index], false)) 
                             copy[index2].sum_hh = copy[index2].children.map(el => el.sum_hh).reduce((a, b) => a + b, 0);
                             dup = true;
                             break;
@@ -260,7 +301,7 @@ const TableReports = () =>{
                     if(!dup){
                         copy.push({
                             ...mapObj(currDataSrc[index], true),
-                            children: [mapObj(currDataSrc[index], false)]
+                            children: mapObj(currDataSrc[index], false)
                         })
                     }
                 }
@@ -280,12 +321,13 @@ const TableReports = () =>{
                 }
             }
            //Sede / Cliente / Colaborador / Actividad / Sum(HH Clockify) / % Ocupación / % Real / Grupo Solucionador
-            for (let index = 0; index < copy.length; index++) {
+           for (let index = 0; index < copy.length; index++) {
                 data2Print.push([
-                    {value: copy[index].Sede, style: styleSub},
                     {value: copy[index].Cliente, style: styleSub},
+                    {value: copy[index].Sede, style: styleSub},
                     {value: copy[index].Colaborador, style: styleSub},
                     {value: copy[index].Actividad, style: styleSub},
+                    {value: copy[index].sum_month, style: styleSub},
                     {value: copy[index].sum_hh, style: styleSub},
                     {value: copy[index].OcupacionPerc, style: styleSub},
                     {value: copy[index].OcupacionReal, style: styleSub},
@@ -293,10 +335,11 @@ const TableReports = () =>{
                 ])
                 for (let index2 = 0; index2 < copy[index].children.length; index2++) {
                     data2Print.push([
-                        {value: copy[index].children[index2].Sede},
                         {value: copy[index].children[index2].Cliente},
+                        {value: copy[index].children[index2].Sede},
                         {value: copy[index].children[index2].Colaborador},
                         {value: copy[index].children[index2].Actividad},
+                        {value: copy[index].children[index2].sum_month},
                         {value: copy[index].children[index2].sum_hh},
                         {value: copy[index].children[index2].OcupacionPerc},
                         {value: copy[index].children[index2].OcupacionReal},
@@ -312,14 +355,14 @@ const TableReports = () =>{
     }, [reload2])// eslint-disable-line react-hooks/exhaustive-deps
     let columns = [
         {
-            title: RowFormatter.ToolTitle('Sede', 'Nombre de la sede.'),
-            key: 'cli_id',
-            render: (data)=>{return(<RowFormatter.RenderText text={data.Sede}/>)}
-        },
-        {
             title: RowFormatter.ToolTitle('Cliente', 'Nombre del cliente.'),
             key: 'cli_id',
             render: (data)=>{return(<RowFormatter.RenderClient2 data={data.activities} parent={data.parent}/>)}
+        },
+        {
+            title: RowFormatter.ToolTitle('Sede', 'Nombre de la sede.'),
+            key: 'cli_id',
+            render: (data)=>{return(<RowFormatter.RenderText text={data.Sede}/>)}
         },
         {
             title: RowFormatter.ToolTitle('Colaborador', 'Nombre del Colaborador'),
@@ -330,6 +373,11 @@ const TableReports = () =>{
             title: RowFormatter.ToolTitle('Actividad', 'Titulo de la actividad.'),
             key: 'cli_id',
             render: (data)=>{return(<RowFormatter.RenderText text={data.Actividad}/>)}
+        },
+        {
+            title: RowFormatter.ToolTitle('Periodo de desarrollo', 'Periodo en el que se desarrollo la Ocupación'),
+            key: 'cli_id',
+            render: (data)=>{return(<RowFormatter.RenderText text={data.sum_month}/>)}
         },
         {
             title: RowFormatter.ToolTitle('% Ocupación ', 'Ocupación estimada.'),
@@ -364,7 +412,7 @@ const TableReports = () =>{
                     <div>
             <Divider orientation="left">Filtros</Divider>
             <Form 
-                l>
+                layout='inline'>
                 <Form.Item name="client" label="Clientes">
                     <Select 
                         placeholder="Cliente..."

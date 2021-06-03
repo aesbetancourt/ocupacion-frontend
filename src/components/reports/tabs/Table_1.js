@@ -27,62 +27,36 @@ const { RangePicker } = DatePicker
 
 // Exported Component
 const TableReports = () =>{
+    const styleTitle = {
+        fill: {
+            patternType: "solid", 
+            fgColor: {rgb: "888888"}
+        },
+        font: {
+            color: {rgb: "000000"},
+            bold:true
+        }
+    }
     const [dataSource, setDataSource] = useState([]);
     const [printDataSet, setPrintDataSet] = useState([
         {
             columns: [
                 {
                     title: "Cliente", 
-                    width: {wch: 20}, 
-                    style: {
-                        fill: {
-                            patternType: "solid", 
-                            fgColor: {rgb: "666666"}
-                        },
-                        font: {
-                            color: {rgb: "FFFFFF"},
-                            bold:true
-                        }
-                    }
+                    width: {wch: 40}, 
+                    style: styleTitle
                 },{
                     title: "Actividad", 
-                    width: {wch: 80}, 
-                    style: {
-                        fill: {
-                            patternType: "solid", 
-                            fgColor: {rgb: "666666"}
-                        },
-                        font: {
-                            color: {rgb: "FFFFFF"},
-                            bold:true
-                        }
-                    }
+                    width: {wch: 40}, 
+                    style: styleTitle
                 },{
                     title: "Sum(HH Clockify)", 
-                    width: {wch: 20}, 
-                    style: {
-                        fill: {
-                            patternType: "solid", 
-                            fgColor: {rgb: "666666"}
-                        },
-                        font: {
-                            color: {rgb: "FFFFFF"},
-                            bold:true
-                        }
-                    }
+                    width: {wch: 40}, 
+                    style: styleTitle
                 },{
                     title: "Grupo Solucionador", 
-                    width: {wch: 20}, 
-                    style: {
-                        fill: {
-                            patternType: "solid", 
-                            fgColor: {rgb: "666666"}
-                        },
-                        font: {
-                            color: {rgb: "FFFFFF"},
-                            bold:true
-                        }
-                    }
+                    width: {wch: 40}, 
+                    style: styleTitle
                 }
             ],
             data: []
@@ -281,7 +255,7 @@ const TableReports = () =>{
                     <div>
             <Divider orientation="left">Filtros</Divider>
             <Form 
-                l>
+                layout='inline'>
                 <Form.Item name="client" label="Clientes">
                     <Select 
                         placeholder="Cliente..."
